@@ -18,6 +18,7 @@ export class BlueprintNode {
     this.template = JSON.parse(JSON.stringify(config)); 
     this.template.onExecute = config.onExecute; 
     this.template.getOutputValue = config.getOutputValue;
+    this.template.onInit = config.onInit;
     
     this.title = config.title;
     this.color = config.color;
@@ -31,6 +32,11 @@ export class BlueprintNode {
     
     this.pins = [];
     this.element = this._createTemplate(this.template);
+    
+    if (this.template.onInit) {
+      this.template.onInit(this);
+    }
+
     this._initDragging();
     this._initResizing();
   }

@@ -6,6 +6,9 @@ import { BUILTIN_NODES } from '../nodes/builtin.js';
 import { CUSTOM_NODES } from '../custom-nodes/index.js';
 
 export class BlueprintEditor {
+  /**
+   * Initializes the editor, references DOM elements, and sets up initial state.
+   */
   constructor() {
     this.container = document.getElementById('editor-container');
     this.grid = document.getElementById('grid');
@@ -39,6 +42,10 @@ export class BlueprintEditor {
     this._init();
   }
 
+  /**
+   * Sets up event listeners, initializes the node picker, and spawns default nodes.
+   * @private
+   */
   _init() {
     this._setupGlobalEvents();
     this._setupNodePicker();
@@ -55,6 +62,11 @@ export class BlueprintEditor {
     this._updateTransform();
   }
 
+  /**
+   * Adds a message to the output log UI.
+   * @param {string} message - The text to log.
+   * @param {'info'|'warning'|'success'|'error'|'system'} [type='info'] - The style/category of the log.
+   */
   log(message, type = 'info') {
     const entry = document.createElement('div');
     entry.className = 'log-entry';
@@ -65,6 +77,9 @@ export class BlueprintEditor {
     this.logListEl.scrollTop = this.logListEl.scrollHeight;
   }
 
+  /**
+   * Starts the simulation by executing all event nodes.
+   */
   async run() {
     this.log('Starting simulation...', 'system');
     this.playBtn.disabled = true;
@@ -88,6 +103,13 @@ export class BlueprintEditor {
     this.playBtn.classList.remove('opacity-50', 'cursor-not-allowed');
   }
 
+  /**
+   * Creates a DOM element for a node in the picker list.
+   * @private
+   * @param {string} key - The unique key of the node type.
+   * @param {Object} t - The node template configuration.
+   * @returns {HTMLElement} The picker item element.
+   */
   _createPickerItem(key, t) {
     const isCustom = CUSTOM_NODES.hasOwnProperty(key);
     const item = document.createElement('div');
@@ -113,6 +135,10 @@ export class BlueprintEditor {
     return item;
   }
 
+  /**
+   * Renders the list of available nodes in the picker, filtering by search or context.
+   * @private
+   */
   _setupNodePicker() {
     const renderList = (filter = '') => {
       this.nodePickerList.innerHTML = '';
@@ -209,6 +235,13 @@ export class BlueprintEditor {
     renderList();
   }
 
+  /**
+   * Displays the node picker context menu at a specific position.
+   * @private
+   * @param {number} clientX - Mouse X position.
+   * @param {number} clientY - Mouse Y position.
+   * @param {BlueprintPin} [contextPin=null] - Optional pin to filter compatible nodes for.
+   */
   _showNodePicker(clientX, clientY, contextPin = null) {
     const rect = this.container.getBoundingClientRect();
     const x = clientX - rect.left;
@@ -223,11 +256,19 @@ export class BlueprintEditor {
     setTimeout(() => this.nodePickerSearch.focus(), 10);
   }
 
+  /**
+   * Hides the node picker.
+   * @private
+   */
   _hideNodePicker() {
     this.nodePicker.style.display = 'none';
     this.currentContextPin = null;
   }
 
+  /**
+   * Attaches global event listeners for interaction (pan, zoom, drag, shortcuts).
+   * @private
+   */
   _setupGlobalEvents() {
     this.container.addEventListener('mousedown', (e) => {
       if (this.nodePicker.style.display === 'flex' && !this.nodePicker.contains(e.target)) this._hideNodePicker();
@@ -304,6 +345,12 @@ export class BlueprintEditor {
     });
   }
 
+  /**
+   * Handles visual feedback when dragging a connection over potential target pins.
+   * @private
+   * @param {number} mx - Mouse X position.
+   * @param {number} my - Mouse Y position.
+   */
   _handleDraftHover(mx, my) {
     const hit = document.elementFromPoint(mx, my);
     const pinHandle = hit?.closest('.pin-handle');
@@ -321,10 +368,23 @@ export class BlueprintEditor {
     }
   }
 
+  /**
+   * Checks if two pins can be connected (type matching, direction, etc.).
+   * @private
+   * @param {BlueprintPin} source - The starting pin.
+   * @param {BlueprintPin} target - The potential target pin.
+   * @returns {boolean} True if compatible.
+   */
   _checkCompatibility(source, target) {
     return source.node !== target.node && source.direction !== target.direction && source.type === target.type;
   }
 
+  /**
+   * Helper to find a pin object by its DOM ID.
+   * @private
+   * @param {string} id - The DOM ID of the pin handle.
+   * @returns {BlueprintPin|null}
+   */
   _findPinById(id) {
     for (const node of this.nodes) {
       const pin = node.pins.find(p => p.id === id);
@@ -333,6 +393,10 @@ export class BlueprintEditor {
     return null;
   }
 
+  /**
+   * Updates the CSS transform for panning and zooming the canvas.
+   * @private
+   */
   _updateTransform() {
     const transform = `translate(${this.pan.x}px, ${this.pan.y}px) scale(${this.zoom})`;
     this.nodeLayer.style.transform = transform;
@@ -341,6 +405,13 @@ export class BlueprintEditor {
     this.grid.style.backgroundSize = `${200 * this.zoom}px ${200 * this.zoom}px, ${200 * this.zoom}px ${200 * this.zoom}px, ${20 * this.zoom}px ${20 * this.zoom}px, ${20 * this.zoom}px ${20 * this.zoom}px`;
   }
 
+  /**
+   * Creates and adds a new node to the editor at specified coordinates.
+   * @param {Object} template - The node configuration template.
+   * @param {number} x - World X position.
+   * @param {number} y - World Y position.
+   * @returns {BlueprintNode} The created node instance.
+   */
   addNode(template, x, y) {
     const snappedX = Math.round(x / GRID_SIZE) * GRID_SIZE;
     const snappedY = Math.round(y / GRID_SIZE) * GRID_SIZE;
@@ -352,6 +423,10 @@ export class BlueprintEditor {
     return node;
   }
 
+  /**
+   * Removes a node and its connections from the editor.
+   * @param {BlueprintNode} node - The node to delete.
+   */
   deleteNode(node) {
     if (!node) return;
     
@@ -378,20 +453,38 @@ export class BlueprintEditor {
     this._updateStats();
   }
 
+  /**
+   * Selects a node visually and updates internal state.
+   * @param {BlueprintNode|null} node - The node to select, or null to deselect.
+   */
   selectNode(node) {
     this.selectedNode = node;
     this.nodes.forEach(n => n.element.classList.toggle('selected', n === node));
   }
 
+  /**
+   * Begins the process of creating a new connection (drag start).
+   * @param {BlueprintPin} pin - The source pin.
+   */
   startConnection(pin) {
     this.activeDraft = new BlueprintConnection(this.svgLayer, pin);
     this.activeDraft.update();
   }
 
+  /**
+   * Finalizes a connection between the draft source and a target pin.
+   * @param {BlueprintPin} targetPin - The destination pin.
+   */
   completeConnection(targetPin) {
     this._createConnection(this.activeDraft.fromPin, targetPin);
   }
 
+  /**
+   * Internal method to create the actual connection object between two pins.
+   * @private
+   * @param {BlueprintPin} pinA - First pin.
+   * @param {BlueprintPin} pinB - Second pin.
+   */
   _createConnection(pinA, pinB) {
     const from = pinA.direction === PinDirection.OUTPUT ? pinA : pinB;
     const to = pinA.direction === PinDirection.INPUT ? pinA : pinB;
@@ -408,10 +501,17 @@ export class BlueprintEditor {
     this._updateStats();
   }
 
+  /**
+   * Redraws all connections (e.g., during panning or node dragging).
+   */
   updateConnections() {
     this.connections.forEach(c => c.update());
   }
 
+  /**
+   * Updates the debug statistics overlay (node count, zoom level, etc.).
+   * @private
+   */
   _updateStats() {
     document.getElementById('stat-nodes').innerText = this.nodes.length;
     document.getElementById('stat-links').innerText = this.connections.length;

@@ -236,5 +236,29 @@ export const BUILTIN_NODES = {
       const condition = !!(await node.getInputValue('Condition'));
       await node.triggerOutput(condition ? 'True' : 'False');
     }
+  },
+  TOSTRING: {
+    title: 'ToString',
+    category: 'Casting',
+    color: 'bg-zinc-600',
+    glowColor: 'rgba(161, 161, 170, 0.4)',
+    glowRGB: '161, 161, 170',
+    inputs: [
+      { name: '', type: PinType.EXEC },
+      { name: 'Value', type: PinType.NUMBER }
+    ],
+    outputs: [
+      { name: '', type: PinType.EXEC },
+      { name: 'String', type: PinType.STRING }
+    ],
+    onExecute: async (node) => {
+      // 1. Fluss weitergeben: Wir triggern den Exec-Pin mit dem Namen ''
+      await node.triggerOutput('');
+    },
+    // 2. Daten bereitstellen: Wird aufgerufen, wenn die nächste Node den Wert braucht
+    getOutputValue: async (node, pinName) => {
+      const value = await node.getInputValue('Value');
+      return String(value);
+    }
   }
 };
