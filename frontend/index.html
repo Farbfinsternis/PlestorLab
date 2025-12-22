@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>PlestorLab</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+	<link href="css/editor.css" rel="stylesheet">
+</head>
+<body>
+	<div id="editor-container">
+		<div id="grid" class="grid-layer"></div>
+		<div class="vignette"></div>
+		<svg id="svg-layer" class="svg-layer" width="100%" height="100%"></svg>
+		<div id="node-layer" class="node-layer"></div>
+		
+		<button id="play-button" class="fixed top-6 right-6 z-[10001] px-6 py-2.5 rounded-full flex items-center gap-2 text-white font-bold text-sm">
+			<div class="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[10px] border-l-white"></div>
+			SIMULATE
+		</button>
+
+		<div id="node-picker">
+			<input type="text" placeholder="Search Actions..." id="node-picker-search">
+			<div id="node-picker-list" class="pb-4"></div>
+		</div>
+
+		<div class="fixed bottom-[180px] left-6 z-[10000] pointer-events-none">
+			<div class="bg-zinc-900/80 backdrop-blur-md border border-zinc-800/50 rounded-lg px-4 py-2 shadow-xl flex gap-6 items-center">
+				<div class="flex flex-col">
+					<span class="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Nodes</span>
+					<span id="stat-nodes" class="text-xs font-mono text-amber-500">0</span>
+				</div>
+				<div class="flex flex-col">
+					<span class="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Links</span>
+					<span id="stat-links" class="text-xs font-mono text-amber-500">0</span>
+				</div>
+				<div class="flex flex-col">
+					<span class="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Zoom</span>
+					<span id="stat-zoom" class="text-xs font-mono text-amber-500">100%</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="output-log">
+		<div class="log-header">
+			<div class="flex items-center gap-2">
+				<div class="w-2 h-2 rounded-full bg-zinc-600"></div>
+				<span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Output Log</span>
+			</div>
+			<button id="clear-log" class="text-[9px] text-zinc-500 hover:text-white uppercase font-bold tracking-tighter px-2 py-1 rounded hover:bg-zinc-800 transition-colors">Clear</button>
+		</div>
+		<div id="log-list"></div>
+	</div>
+
+	<script type="module" src="classes/index.js"></script>
+</body>
+</html>
